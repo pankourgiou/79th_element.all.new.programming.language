@@ -1,0 +1,191 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>79th_element · Select to Run</title>
+<style>
+:root{color-scheme:dark;--bg:#0c0e16;--fg:#eef0ff;--ac:#ffd34d;--c2:#66e0ff;--pn:#181c2c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{background:var(--bg)}
+body{margin:auto;padding:10px;color:var(--fg);font-family:"Courier New",monospace;max-width:680px}
+canvas{display:block;width:100%;image-rendering:pixelated;border:3px solid var(--ac);box-sizing:border-box;background:#05060f}
+#ed{position:relative;margin-top:8px}
+#ed pre,#ed textarea{margin:0;padding:8px;box-sizing:border-box;border:3px solid var(--c2);font:15px/1.5 "Courier New",monospace;white-space:pre-wrap;word-wrap:break-word;width:100%}
+#ed pre{position:relative;min-height:170px;background:var(--pn);color:transparent;pointer-events:none}
+#ed textarea{position:absolute;inset:0;height:100%;overflow:hidden;resize:none;background:transparent;color:var(--fg);caret-color:#fff}
+#ed textarea::selection{background:rgba(255,211,77,.4);color:#fff}
+mark{color:transparent;border-radius:2px}mark.c1{background:rgba(102,224,255,.2);box-shadow:0 0 0 1px rgba(102,224,255,.35)}mark.c2{background:rgba(255,190,40,.6);box-shadow:0 0 14px #ffd34d;animation:p .45s infinite alternate}mark.c3{background:rgba(255,70,70,.65)}@keyframes p{to{background:rgba(255,240,150,.75)}}
+button{background:var(--ac);color:#000;border:0;padding:7px 11px;font:bold 14px "Courier New",monospace;margin:6px 6px 0 0;cursor:pointer}
+button.b2{background:#8c93b8}button.on{background:var(--c2)}
+h2{font-size:16px;color:var(--ac);margin:14px 0 4px}
+#info,#msg{margin-top:8px;line-height:1.5}#msg{min-height:22px;font-weight:bold}
+details{background:var(--pn);border:2px solid #39406a;padding:8px;margin-top:10px}
+td{padding:2px 10px 2px 0;vertical-align:top}code{color:var(--ac)}
+</style></head><body>
+<canvas id="hero" width="640" height="100"></canvas>
+<h2>⛏ Missions</h2><div id="ms"></div><div id="info"></div>
+<canvas id="c" width="640" height="420" style="margin-top:6px"></canvas>
+<button id="rl" class="b2">⟲ Rotate</button><button id="rr" class="b2">⟳ Rotate</button><button id="snd" class="b2">🔊 Sound ON</button>
+<h2>⌨ Code .79th_element</h2><div style="opacity:.85;margin-top:2px">✨ Highlight (select) code with your mouse or finger — it runs right away. There is no Run button!</div>
+<div id="ed"><pre id="hl"></pre><textarea id="src" spellcheck="false"></textarea></div>
+<button id="rs" class="b2">↺ Reset</button><button id="sv" class="b2">💾 Save</button><button id="op" class="b2">📂 Open</button><select id="spd" style="margin-left:6px;padding:6px;font:bold 14px 'Courier New',monospace"><option value="520">Slow</option><option value="260" selected>Normal</option><option value="90">Fast</option></select>
+<input type="file" id="fl" accept=".79th_element,.txt,text/plain" style="display:none">
+<div id="msg"></div>
+<canvas id="scr" width="640" height="180" style="margin-top:8px"></canvas>
+<h2>📚 Examples</h2><div id="ex"></div>
+<details><summary><b>Help — the language</b></summary><table>
+<tr><td><code>print / γράψε</code></td><td>print a value with sound: <code>print "Hi"</code></td></tr>
+<tr><td><code>let / όρισε</code></td><td><code>let n = 5</code> · then <code>n = n + 1</code></td></tr>
+<tr><td><code>repeat / επανάλαβε</code></td><td><code>repeat 3 { ... }</code></td></tr>
+<tr><td><code>if … else / αν … αλλιώς</code></td><td><code>if n % 2 == 0 { ... } else { ... }</code></td></tr>
+<tr><td><code>fn / συνάρτηση · call / κάλεσε</code></td><td><code>fn name { ... }</code> · <code>call name</code></td></tr>
+<tr><td><code>move / προχώρα n</code></td><td>Steve walks n blocks</td></tr>
+<tr><td><code>turn / στρίψε left|right|αριστερά|δεξιά</code></td><td>turn</td></tr>
+<tr><td><code>mine / σκάψε</code></td><td>break the stone in front</td></tr>
+<tr><td><code>score / βαθμοί</code></td><td>glowing blocks collected so far</td></tr>
+<tr><td>operators</td><td><code>+ - * / % ^ &lt; &gt; == != &lt;= &gt;= ( )</code> · comments: <code>#</code></td></tr>
+</table><p>Collect every glowing block. Select any code in the editor to run just that part. The line being run lights up, and Steve and your variables stay where they are until you press Reset. Every letter and digit you print plays its own note.</p></details>
+<script>
+const FONT="A 01110 10001 11111 10001 10001|B 11110 10001 11110 10001 11110|C 01111 10000 10000 10000 01111|D 11110 10001 10001 10001 11110|E 11111 10000 11110 10000 11111|F 11111 10000 11110 10000 10000|G 01111 10000 10011 10001 01111|H 10001 10001 11111 10001 10001|I 11111 00100 00100 00100 11111|J 00111 00001 00001 10001 01110|K 10001 10010 11100 10010 10001|L 10000 10000 10000 10000 11111|M 10001 11011 10101 10001 10001|N 10001 11001 10101 10011 10001|O 01110 10001 10001 10001 01110|P 11110 10001 11110 10000 10000|Q 01110 10001 10101 10010 01101|R 11110 10001 11110 10010 10001|S 01111 10000 01110 00001 11110|T 11111 00100 00100 00100 00100|U 10001 10001 10001 10001 01110|V 10001 10001 10001 01010 00100|W 10001 10001 10101 11011 10001|X 10001 01010 00100 01010 10001|Y 10001 01010 00100 00100 00100|Z 11111 00010 00100 01000 11111|α 01110 10001 10001 10011 01101|β 11110 10001 11110 10001 11110|γ 10001 10001 01010 00100 00100|δ 01110 01000 01110 10001 01110|ε 01111 10000 01110 10000 01111|ζ 11111 00010 00100 01000 01111|η 11110 10001 10001 10001 10001|θ 01110 10001 11111 10001 01110|ι 00100 00100 00100 00100 00010|κ 10010 10100 11000 10100 10010|λ 10000 01000 00100 01010 10001|μ 10001 10001 10001 11110 10000|ν 10001 10001 10001 01010 00100|ξ 11111 10000 01110 10000 01111|ο 01110 10001 10001 10001 01110|π 11111 01010 01010 01010 01010|ρ 11110 10001 11110 10000 10000|σ 01111 10010 10001 10001 01110|τ 11111 00100 00100 00100 00010|υ 10001 10001 10001 10001 01110|φ 00100 01110 10101 01110 00100|χ 10001 01010 00100 01010 10001|ψ 10101 10101 10101 01110 00100|ω 10001 10001 10101 11011 10001|0 01110 10011 10101 11001 01110|1 00100 01100 00100 00100 01110|2 01110 10001 00110 01000 11111|3 11110 00001 01110 00001 11110|4 10010 10010 11111 00010 00010|5 11111 10000 11110 00001 11110|6 01110 10000 11110 10001 01110|7 11111 00001 00010 00100 00100|8 01110 10001 01110 10001 01110|9 01110 10001 01111 00001 01110|, 00000 00000 00000 00100 01000|. 00000 00000 00000 00000 00100|! 00100 00100 00100 00000 00100|? 01110 00001 00110 00000 00100|: 00000 00100 00000 00100 00000|- 00000 00000 11111 00000 00000|_ 00000 00000 00000 00000 11111|+ 00100 00100 11111 00100 00100|= 00000 11111 00000 11111 00000|/ 00001 00010 00100 01000 10000|( 00010 00100 00100 00100 00010|) 01000 00100 00100 00100 01000|< 00010 00100 01000 00100 00010|> 01000 00100 00010 00100 01000|^ 00100 01010 10001 00000 00000|* 00000 10101 01110 10101 00000|% 11001 11010 00100 01011 10011|# 01010 11111 01010 11111 01010|' 00100 00100 00000 00000 00000|; 00000 00100 00000 00100 01000|[ 01110 01000 01000 01000 01110|] 01110 00010 00010 00010 01110|{ 00110 00100 01100 00100 00110|} 01100 00100 00110 00100 01100|@ 01110 10111 10111 10000 01110|& 01100 10010 01101 10010 01101|~ 00000 01001 10110 00000 00000|$ 01111 10100 01110 00101 11110|² 11100 00100 11100 10000 11100|³ 11100 00100 01100 00100 11100";
+const F={};FONT.split("|").forEach(s=>{const p=s.split(" ");F[p[0]]=p.slice(1)});
+const BOX=["11111","10001","10001","10001","11111"];
+const $=i=>document.getElementById(i),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const key=c=>{c=c.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ς/g,"σ");return/[a-z]/.test(c)?c.toUpperCase():c};
+const norm=w=>w.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ς/g,"σ");
+const rnd=(x,y,k)=>(Math.sin(x*12.9898+y*78.233+k*37.7)*43758.5453)%1;
+// ---- sound
+let AC,mute=false;
+function tone(f,d,ty,v){if(mute||!AC)return;const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type=ty;o.frequency.value=f;g.gain.setValueAtTime(v||.05,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d)}
+function csnd(ch){const k=key(ch),P=[0,2,4,7,9];if(/\d/.test(k))tone(262*2**(k*2/12),.09,"square",.04);
+else if(/[A-Z]/.test(k)){const i=k.charCodeAt(0)-65;tone(196*2**((P[i%5]+12*((i/5|0)%3))/12),.09,"triangle",.09)}
+else if(/[α-ω]/.test(k)){const i=k.charCodeAt(0)-945;tone(330*2**((P[i%5]+12*((i/5|0)%3))/12),.1,"sawtooth",.035)}
+else if(k!=" ")tone(120,.05,"square",.04)}
+document.addEventListener("click",()=>{if(!AC)try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}if(AC&&AC.state=="suspended")AC.resume()});
+$("snd").onclick=()=>{mute=!mute;$("snd").textContent=mute?"🔇 Sound OFF":"🔊 Sound ON"};
+// ---- pixel text: rainbow highlight, white head
+function ptext(ctx,x,y,s,txt,n,col){let cnt=0,T=Date.now()/14;for(const ch of txt){const gl=F[key(ch)]||(ch==" "?null:BOX);
+if(gl)for(let r=0;r<5;r++)for(let c=0;c<5;c++)if(gl[r][c]=="1"){
+if(cnt<n){const d=n-cnt,hot=d<=7;const fc=col=="rb"?`hsl(${(cnt*9+T)%360},95%,${d<=45?74:56}%)`:col;
+if(hot){ctx.fillStyle="rgba(255,255,255,.3)";ctx.fillRect(x+c*s-1,y+r*s-1,s+1,s+1)}
+ctx.fillStyle=hot?"#fff":fc;ctx.fillRect(x+c*s,y+r*s,s-1,s-1)}
+cnt++}
+x+=6*s}return cnt}
+const hx=$("hero").getContext("2d");let hn=0;
+setInterval(()=>{hx.fillStyle="#05060f";hx.fillRect(0,0,640,100);const a=ptext(hx,68,10,7,"79TH_ELEMENT",hn,"rb");ptext(hx,52,64,3,"ELEMENT 79 - ΣΤΟΙΧΕΙΟ 79",hn-a,"rb");hn=(hn+14)%800},30);
+const sx=$("scr").getContext("2d");let out=[];
+function scr(){sx.fillStyle="#05060f";sx.fillRect(0,0,640,180);out.slice(-7).forEach((l,i)=>ptext(sx,8,8+i*24,3,l.t,l.n,"rb"))}
+setInterval(()=>{const l=out.find(l=>l.n<l.max);if(l){l.n+=8;while(l.k<l.t.length&&l.n>(l.k?l.cum[l.k-1]:0)){csnd(l.t[l.k]);l.k++}if(l.n>=l.max){l.n=l.max+99;l.dt=Date.now()}}scr()},40);
+async function say(t){for(const p of(t.match(/.{1,34}/g)||[""])){let m=0;const cum=[];for(const ch of p){const gl=F[key(ch)]||(ch==" "?null:BOX);if(gl)m+=gl.join("").split("1").length-1;cum.push(m)}out.push({t:p,n:0,max:m,cum,k:0,dt:m?0:Date.now()})}while(out.some(l=>l.n<l.max))await sleep(30)}
+// ---- world
+const N=9,DIR=[[0,-1],[1,0],[0,1],[-1,0]];let VR=0;
+const rot=(x,y)=>[[x,y],[N-1-y,x],[N-1-x,N-1-y],[y,N-1-x]][VR],rd=(x,y)=>[[x,y],[-y,x],[-x,-y],[y,-x]][VR];
+const MS=[
+{n:"Sandbox",g:"Play freely and collect the glowing blocks.",s:[1,4,1],m:["G..T....W",".........","..H...TT.","...S.....",".........","......TG.","....WWW..","L........","...G....T"]},
+{n:"1 First Steps",g:"Walk the row and collect 3 glowing blocks.",s:[0,4,1],m:["T......WW","..T......","....H....",".........","..G..G..G",".........","..L......",".T.....T.","........."]},
+{n:"2 Corner Mine",g:"Collect the 3 glowing blocks around the corner.",s:[0,8,1],m:["....G...G","..T......",".TT......",".WW......",".........","....S....","..H......",".........","........G"]},
+{n:"3 Stone Gate",g:"Mine through the stone and reach the glowing blocks.",s:[0,4,1],m:["T..WWW...","...W.....","....H....","..T......","...SSSG.G",".........","....L....",".T.....T.","W.......T"]},
+{n:"4 Lava Pond",g:"Circle the lava pond and take all 3 glowing blocks.",s:[1,1,1],m:[".........",".......G.","...WWW...","...WLW...","...WWW...","....T....","...H.....",".G.....G.","........."]}];
+const EX=[
+{n:"Hello",m:0,c:'print "Hello World!"\nprint "Γεια σου Κόσμε!"\nprint 79'},
+{n:"Rainbow sound",m:0,c:'print "ABCDEFGHIJKLM"\nprint "ΑΒΓΔΕΖΗΘΙΚΛΜΝ"\nprint "0123456789"'},
+{n:"Count",m:0,c:'let n = 1\nrepeat 5 {\n  print n\n  n = n + 1\n}'},
+{n:"Greek",m:0,c:'όρισε α = 3\nεπανάλαβε α {\n  γράψε "ΓΕΙΑ"\n}\nγράψε α * 79'},
+{n:"Math",m:0,c:'print 79 - 1\nprint 79 * 2\nprint 2 ^ 10\nprint 10 % 3\nprint "E=mc^2"'},
+{n:"Odd/Even",m:0,c:'let n = 1\nrepeat 6 {\n  if n % 2 == 0 { print "EVEN" } else { print "ODD" }\n  n = n + 1\n}'},
+{n:"Function",m:0,c:'fn lap {\n  repeat 4 {\n    move 2\n    turn right\n  }\n}\ncall lap\nprint "LAP DONE"'},
+{n:"Mission 1",m:1,c:'repeat 4 {\n  move 2\n}\nprint score'},
+{n:"Mission 1 (GR)",m:1,c:'επανάλαβε 8 {\n  προχώρα 1\n}\nγράψε "ΤΕΛΟΣ"'},
+{n:"If score",m:1,c:'repeat 8 {\n  move 1\n  if score == 3 { print "RICH!" }\n}\nprint score'},
+{n:"Mission 2",m:2,c:'move 8\nturn left\nmove 8\nturn left\nmove 4\nprint "SCORE=" + score'},
+{n:"Mission 3",m:3,c:'move 2\nrepeat 3 {\n  mine\n  move 1\n}\nmove 3\nprint "NICE!"'},
+{n:"Mission 4",m:4,c:'fn side {\n  move 6\n  turn right\n}\nrepeat 4 {\n  call side\n}\nprint "ALL DONE"'}];
+const g=$("c").getContext("2d");let cur=0,S,busy=false;
+function hud(){$("info").textContent="🎯 "+MS[cur].g+"  ·  ⭐ "+S.got+"/"+S.tot}
+function mission(i){cur=i;$("ms").innerHTML="";MS.forEach((m,j)=>{const b=document.createElement("button");b.textContent=m.n;b.className=j==i?"on":"b2";b.onclick=()=>{if(!busy){mission(j);setSrc("")}};$("ms").appendChild(b)});reset()}
+function reset(){V={};fns={};const M=MS[cur];S={x:M.s[0],y:M.s[1],fx:M.s[0],fy:M.s[1],d:M.s[2],m:M.m.map(r=>r.split("")),got:0};S.tot=S.m.flat().filter(c=>c=="G").length;$("msg").textContent="";out=[];scr();hud()}
+function P(p,c){g.fillStyle=c;g.beginPath();g.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)g.lineTo(p[i][0],p[i][1]);g.closePath();g.fill();g.strokeStyle="rgba(0,0,0,.22)";g.stroke()}
+function cube(X,Y,hw,hh,h,t,l,r){P([[X,Y-hh],[X+hw,Y],[X,Y+hh],[X-hw,Y]],t);P([[X-hw,Y],[X,Y+hh],[X,Y+hh+h],[X-hw,Y+h]],l);P([[X+hw,Y],[X,Y+hh],[X,Y+hh+h],[X+hw,Y+h]],r)}
+const sp=(rx,ry)=>[320+(rx-ry)*32,100+(rx+ry)*16];
+function cell(x,y){const c=S.m[y][x],[rx,ry]=rot(x,y),[X,Y]=sp(rx,ry),edge=(rx==N-1||ry==N-1)?26:0;
+if(c=="S")cube(X,Y-32,32,16,32+edge,"#9a9a9a","#777","#5c5c5c");
+else if(c=="W"){const a=.75+.25*Math.sin(Date.now()/400+x+y);cube(X,Y-10,32,16,10+edge,`rgba(47,111,224,${a})`,"#2a58b8","#1f4590")}
+else if(c=="L"){const b=Math.sin(Date.now()/250+x*2+y)>0;cube(X,Y-10,32,16,10+edge,b?"#ffb02e":"#ff6a00","#c04800","#9a3700")}
+else{cube(X,Y-16,32,16,16+edge,"#5db33a","#8b5a2b","#6e4520");for(let i=0;i<3;i++){g.fillStyle="#4a9a2c";g.fillRect(X-14+Math.abs(rnd(x*3+i,y,1))*26,Y-22+Math.abs(rnd(x,y*3+i,2))*12,4,2)}
+const Yt=Y-16;
+if(c=="T"){cube(X,Yt-24,7,3.5,24,"#8a5a2a","#6e4520","#573616");cube(X,Yt-46,22,11,20,"#4cbf3a","#2f8f2a","#256f20")}
+if(c=="G"){cube(X,Yt-9,13,6.5,9,"#f0b8ff","#b04ae8","#7a2aa8");g.fillStyle=Math.sin(Date.now()/200+x)>0?"#fff":"#ffd6ff";g.fillRect(X-2,Yt-13,4,3)}
+if(c=="H"){cube(X,Yt-30,26,13,30,"#d9b97a","#b48a50","#8f6a38");cube(X,Yt-42,30,15,12,"#e04040","#b22","#8a1818");g.fillStyle="#ffd34d";g.fillRect(X-17,Yt-20,6,6);g.fillStyle="#3b2410";g.fillRect(X+8,Yt-16,7,12)}}}
+function ppos(){const[rx,ry]=rot(S.fx,S.fy),[X,Y]=sp(rx,ry);return[X,Y-16,rx+ry]}
+function astro(){const[X,Y]=ppos(),[a,b]=rd(...DIR[S.d]),ex=(a-b)*6,ey=(a+b)*3;
+g.fillStyle="rgba(0,0,0,.25)";g.fillRect(X-14,Y-2,28,6);
+cube(X,Y-10,7,3.5,10,"#3a4fb8","#2a3f9a","#1b2a6a");cube(X,Y-24,9,4.5,14,"#33c9d9","#27a5b3","#1c7f8a");cube(X,Y-34,9,4.5,10,"#5a3a1a","#e0b48a","#c89a70");
+g.fillStyle="#222";g.fillRect(X+ex-2,Y-28+ey*.6,4,3)}
+function banner(){const L=out.filter(l=>!l.dt||Date.now()-l.dt<6000).slice(-2);if(!L.length)return;const[X,Y]=ppos(),w=Math.max(...L.map(l=>l.t.length))*12,h=L.length*14;
+const x=Math.max(8,Math.min(632-w,X-w/2)),y=Math.max(8,Y-h-60);
+g.fillStyle="rgba(5,10,30,.9)";g.fillRect(x-5,y-5,w+8,h+6);g.strokeStyle="#ffd34d";g.strokeRect(x-4.5,y-4.5,w+7,h+5);L.forEach((l,i)=>ptext(g,x,y+i*14,2,l.t,l.n,"rb"))}
+function draw(){S.fx+=(S.x-S.fx)*.25;S.fy+=(S.y-S.fy)*.25;const t=Date.now();
+const gr=g.createLinearGradient(0,0,0,420);gr.addColorStop(0,"#5aa7ff");gr.addColorStop(1,"#d6ecff");g.fillStyle=gr;g.fillRect(0,0,640,420);
+g.fillStyle="#fff7a8";g.fillRect(560,20,48,48);g.fillStyle="#ffe14d";g.fillRect(566,26,36,36);
+g.fillStyle="rgba(255,255,255,.9)";for(let k=0;k<4;k++){const cx=((t/60+k*180)%780)-120,cy=30+k*34;g.fillRect(cx,cy,64,16);g.fillRect(cx+12,cy-10,36,12);g.fillRect(cx+20,cy+14,48,8)}
+const cs=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++){const[rx,ry]=rot(x,y);cs.push([rx+ry,x,y])}cs.sort((a,b)=>a[0]-b[0]);
+const pd=ppos()[2];let done=false;for(const[d,x,y]of cs){if(!done&&pd<d-.01){astro();done=true}cell(x,y)}if(!done)astro();banner()}
+setInterval(draw,33);
+$("rl").onclick=()=>{VR=(VR+3)%4};$("rr").onclick=()=>{VR=(VR+1)%4};
+function mv(s){const d=DIR[S.d],nx=S.x+d[0],ny=S.y+d[1];if(nx<0||ny<0||nx>=N||ny>=N)throw"Steve fell off the island!";const c=S.m[ny][nx];
+if(s=="mine"){if(c!="S")throw"There is no stone in front!";S.m[ny][nx]=".";tone(90,.15,"sawtooth",.1)}
+else{if(c=="W")throw"Water! Steve can't swim.";if(c=="L")throw"Lava! Ouch!";if(c=="T"||c=="H"||c=="S")throw"Blocked!"+(c=="S"?" (mine the stone)":"");S.x=nx;S.y=ny;tone(150,.05,"triangle",.06);if(c=="G"){S.m[ny][nx]=".";S.got++;hud();tone(988,.08,"square",.05);setTimeout(()=>tone(1319,.18,"square",.05),90)}}}
+// ---- language
+const KW={print:"print",γραψε:"print",εκτυπωσε:"print",repeat:"repeat",επαναλαβε:"repeat",let:"let",ορισε:"let",if:"if",αν:"if",else:"else",αλλιως:"else",move:"move",προχωρα:"move",μπροστα:"move",turn:"turn",στριψε:"turn",left:"left",αριστερα:"left",right:"right",δεξια:"right",mine:"mine",σκαψε:"mine",fn:"fn",συναρτηση:"fn",call:"call",καλεσε:"call"};
+const OPS={"+":(x,y)=>x+y,"-":(x,y)=>x-y,"*":(x,y)=>x*y,"/":(x,y)=>x/y,"%":(x,y)=>x%y,"^":(x,y)=>Math.pow(x,y),"<":(x,y)=>x<y,">":(x,y)=>x>y,"==":(x,y)=>x==y,"!=":(x,y)=>x!=y,"<=":(x,y)=>x<=y,">=":(x,y)=>x>=y};
+let t,i,fns,V,ops,TP=[],DONE={},CUR=null,ERRHL=false;const peek=()=>t[i],nx=()=>t[i++],isId=w=>/^[\p{L}_]/u.test(w||"");
+const bin=(lv,next)=>()=>{let a=next();while(lv.includes(peek())){const o=nx();a=[o,a,next()]}return a};
+function pri(){const w=nx();if(w===undefined)throw"missing value";if(w=="("){const e=expr();if(nx()!=")")throw"missing )";return e}if(w[0]=='"')return["s",w.slice(1,-1)];if(/^\d/.test(w))return["n",+w];if(w=="-")return["-",["n",0],pri()];if(isId(w))return["v",norm(w)];throw"unexpected: "+w}
+const pw=bin(["^"],pri),mul=bin(["*","/","%"],pw),add=bin(["+","-"],mul),expr=bin(["<",">","==","!=","<=",">="],add);
+function block(){if(nx()!="{")throw"missing {";const o=[];while(peek()!="}"){if(peek()===undefined)throw"missing }";o.push(st())}nx();return o}
+function st0(){const w=nx(),k=KW[norm(w)],a=TP[i-1][0];
+if(k=="print")return["print",expr()];
+if(k=="repeat"){const n=expr(),r=[a,TP[i-1][1]],o=["repeat",n,block()];o.r=r;return o}
+if(k=="let"){const v=norm(nx()||"");if(nx()!="=")throw"missing =";return["set",v,expr()]}
+if(k=="if"){const c=expr(),r=[a,TP[i-1][1]],b=block();let e=[];if(KW[norm(peek()||"")]=="else"){nx();e=block()}const o=["if",c,b,e];o.r=r;return o}
+if(k=="move")return["move",expr()];
+if(k=="turn"){const d=KW[norm(nx()||"")];if(d!="left"&&d!="right")throw"turn left / right";return["turn",d]}
+if(k=="mine")return["mine"];
+if(k=="fn"){const n=norm(nx()||"");fns[n]=block();return["nop"]}
+if(k=="call")return["call",norm(nx()||"")];
+if(isId(w)&&peek()=="="){nx();return["set",norm(w),expr()]}
+throw"unknown word: "+w}
+function st(){const a=TP[i]?TP[i][0]:0,n=st0();if(!n.r)n.r=[a,TP[i-1][1]];return n}
+function render(){const v=$("src").value,c=new Array(v.length).fill(0);Object.values(DONE).forEach(r=>{for(let j=r[0];j<r[1];j++)c[j]=1});if(CUR)for(let j=CUR[0];j<CUR[1];j++)c[j]=ERRHL?3:2;
+const esc=x=>x.replace(/&/g,"&amp;").replace(/</g,"&lt;");let h="",j=0;while(j<v.length){let k=j;while(k<v.length&&c[k]==c[j])k++;h+=c[j]?`<mark class="c${c[j]}">${esc(v.slice(j,k))}</mark>`:esc(v.slice(j,k));j=k}$("hl").innerHTML=h+"\n"}
+function hl(r){if(CUR)DONE[CUR]=CUR;CUR=r;render()}
+function setSrc(v){$("src").value=v;DONE={};CUR=null;ERRHL=false;render()}
+function ev(e){const[o,a,b]=e;if(o=="s"||o=="n")return a;if(o=="v"){if(a in V)return V[a];if(a=="score"||a=="βαθμοι")return S.got;throw"unknown variable: "+a}return OPS[o](ev(a),ev(b))}
+async function exec(list){for(const s of list){if(++ops>3000)throw"Too many steps (infinite loop?)";const k=s[0];if(k!="nop"&&s.r){hl(s.r);await sleep(+$("spd").value)}
+if(k=="print")await say(String(ev(s[1])));
+else if(k=="set")V[s[1]]=ev(s[2]);
+else if(k=="repeat"){const n=ev(s[1]);for(let j=0;j<n;j++)await exec(s[2])}
+else if(k=="if")await exec(ev(s[1])?s[2]:s[3]);
+else if(k=="call"){if(!fns[s[1]])throw"unknown function: "+s[1];await exec(fns[s[1]])}
+else if(k=="turn"){await sleep(250);S.d=(S.d+(s[1]=="left"?3:1))%4}
+else if(k=="move"){const n=ev(s[1]);for(let j=0;j<n;j++){await sleep(240);mv("f")}}
+else if(k=="mine"){await sleep(250);mv("mine")}}}
+const TOK=/"[^"]*"|\d+(\.\d+)?|[\p{L}_][\p{L}\p{N}_]*|==|!=|<=|>=|[{}()+\-*\/%^<>=]/gu;let selTm;
+async function go(){if(busy)return;const ta=$("src"),a=ta.selectionStart,b=ta.selectionEnd;if(b-a<2)return;const m=$("msg");m.style.color="#ff9c8a";CUR=null;ERRHL=false;
+const txt=ta.value.replace(/(\/\/|#).*$/gm,x=>" ".repeat(x.length)),all=[...txt.matchAll(TOK)],pos=x=>[x.index,x.index+x[0].length];
+fns={};t=all.map(x=>x[0]);TP=all.map(pos);i=0;try{while(i<t.length)st()}catch(e){}
+const sel=all.filter(x=>x.index>=a&&x.index+x[0].length<=b);t=sel.map(x=>x[0]);TP=sel.map(pos);i=0;const prog=[];
+try{while(i<t.length)prog.push(st())}catch(e){m.textContent="⚠ "+e;return}
+if(!prog.length)return;
+busy=true;ta.readOnly=true;ops=0;
+try{await exec(prog);
+if(S.tot&&S.got==S.tot){m.style.color="#66e0ff";m.textContent="🎉 All blocks collected!";[523,659,784,1047].forEach((f,j)=>setTimeout(()=>tone(f,.25,"square",.05),j*130));await say("MISSION COMPLETE!")}
+else{m.style.color="#66e0ff";m.textContent="✓ Ran "+prog.length+" statement(s) · ⭐ "+S.got+"/"+S.tot}}
+catch(e){ERRHL=true;render();m.textContent="⚠ "+e;tone(110,.4,"sawtooth",.08);await say("ERROR")}
+if(!ERRHL&&CUR){DONE[CUR]=CUR;CUR=null;render()}ta.readOnly=false;busy=false}
+{const ta=$("src");["mouseup","touchend"].forEach(ev=>ta.addEventListener(ev,()=>setTimeout(go,60)));
+ta.addEventListener("keyup",e=>{if((e.shiftKey&&e.key.startsWith("Arrow"))||((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=="a"))go()});
+document.addEventListener("selectionchange",()=>{if(!matchMedia("(pointer:coarse)").matches||document.activeElement!==ta)return;clearTimeout(selTm);selTm=setTimeout(go,900)})}
+$("rs").onclick=()=>{if(!busy){reset();DONE={};CUR=null;ERRHL=false;render()}};
+EX.forEach(e=>{const b=document.createElement("button");b.className="b2";b.textContent=e.n;b.onclick=()=>{if(busy)return;mission(e.m);setSrc(e.c);window.scrollTo({top:0,behavior:"smooth"})};$("ex").appendChild(b)});
+$("sv").onclick=async()=>{const name="program.79th_element.txt",data=new Blob([$("src").value],{type:"text/plain"});
+try{const d=await claude.use("downloads");if(d){await d.save({filename:name,data});return}}catch(e){if(e&&e.code=="declined")return}
+const a=document.createElement("a");a.href=URL.createObjectURL(data);a.download=name;a.click()};
+$("op").onclick=()=>$("fl").click();
+$("fl").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{setSrc(r.result);$("msg").style.color="#66e0ff";$("msg").textContent="📂 "+f.name};r.readAsText(f);e.target.value=""};
+mission(0);setSrc(EX[0].c);$("src").oninput=()=>{DONE={};CUR=null;ERRHL=false;render()};
+</script></body></html>
